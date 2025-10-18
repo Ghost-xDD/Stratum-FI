@@ -1,0 +1,32 @@
+{
+  "name": "stratum-fi-contracts",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "hardhat test",
+    "compile": "hardhat compile",
+    "deploy": "hardhat ignition deploy ignition/modules/StratumDeployFinal.ts --network mezo-testnet",
+    "deploy:mainnet": "hardhat ignition deploy ignition/modules/StratumDeployFinal.ts --network mezo-mainnet --verify",
+    "fund": "hardhat run scripts/interact/admin-fund-protocol.ts --network mezo-testnet",
+    "deposit": "hardhat run scripts/interact/01-deposit-btc.ts --network mezo-testnet",
+    "borrow": "hardhat run scripts/interact/02-borrow-bmusd.ts --network mezo-testnet",
+    "turbo": "hardhat run scripts/interact/03-turbo-loop-real.ts --network mezo-testnet",
+    "harvest": "hardhat run scripts/interact/04-harvest-yield.ts --network mezo-testnet",
+    "status": "hardhat run scripts/interact/05-check-status.ts --network mezo-testnet",
+    "add-liquidity": "hardhat run scripts/setup/add-liquidity.ts --network mezo-testnet",
+    "get-bmusd": "hardhat run scripts/setup/get-more-bmusd.ts --network mezo-testnet",
+    "fund-more": "hardhat run scripts/setup/fund-more-musd.ts --network mezo-testnet"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "@openzeppelin/contracts": "^4.9.0",
+    "hardhat": "^2.17.0"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.7"
+  }
+}
