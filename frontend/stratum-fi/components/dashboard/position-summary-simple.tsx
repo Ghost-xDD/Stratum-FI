@@ -2,44 +2,86 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import {
-  formatBTC,
-  formatUSD,
-  formatPercentage,
-  getLTVColor,
-} from '@/lib/utils';
+import { formatUSD, formatPercentage, getLTVColor } from '@/lib/utils';
 import { fadeInUp } from '@/lib/constants';
-import { Bitcoin, DollarSign, Sparkles, Zap, TrendingUp } from 'lucide-react';
-
-interface PositionData {
-  collateralBTC: string; // From vaultController.balanceOf()
-  debt: string; // From debtManager.userDebt()
-  maxBorrow: string; // From debtManager.getBorrowingCapacity()[0]
-  available: string; // From debtManager.getBorrowingCapacity()[2]
-  secondaryLP: string; // From turboLoop.getSecondaryLP()
-  claimableYield: string; // From harvester.getClaimableYield()
-  btcPriceUSD: number; // From external API or oracle
-}
+import {
+  Bitcoin,
+  DollarSign,
+  Sparkles,
+  Zap,
+  TrendingUp,
+  Loader2,
+} from 'lucide-react';
+import { useDashboardData } from '@/lib/contracts';
+import { useBTCPrice } from '@/lib/hooks/useBTCPrice';
 
 interface PositionSummarySimpleProps {
-  data?: PositionData;
+  userAddress?: string;
 }
 
-export function PositionSummarySimple({ data }: PositionSummarySimpleProps) {
-  // Use mock data if not provided (for initial demo)
-  const position = data || {
-    collateralBTC: '0.0001',
-    debt: '2.1',
-    maxBorrow: '2.95',
-    available: '0.85',
-    secondaryLP: '1.5',
-    claimableYield: '0.0085',
-    btcPriceUSD: 59000,
-  };
+export function PositionSummarySimple({
+  userAddress,
+}: PositionSummarySimpleProps) {
+  const {
+    position: contractPosition,
+    turboPosition,
+    yieldData,
+    loading,
+    error,
+  } = useDashboardData(userAddress);
+
+  const { price: btcPriceUSD } = useBTCPrice();
+
+  const position = contractPosition
+    ? {
+        collateralBTC: contractPosition.collateralBTC,
+        debt: contractPosition.debt,
+        maxBorrow: contractPosition.maxBorrow,
+        available: contractPosition.available,
+        secondaryLP: turboPosition?.secondaryLP || '0',
+        claimableYield: yieldData?.totalUSD.toString() || '0',
+        btcPriceUSD,
+      }
+    : null;
+
+  if (loading) {
+    return (
+      <Card className="p-8">
+        <div className="flex items-center justify-center gap-3">
+          <Loader2 className="h-5 w-5 animate-spin text-primary" />
+          <span className="text-text-muted">Loading position data...</span>
+        </div>
+      </Card>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card className="p-8 border-error/50 bg-error/5">
+        <div className="text-center">
+          <p className="text-error mb-2">Failed to load position data</p>
+          <p className="text-sm text-text-muted">{error.message}</p>
+        </div>
+      </Card>
+    );
+  }
+
+  if (!userAddress || !position) {
+    return (
+      <Card className="p-8">
+        <div className="text-center">
+          <p className="text-text-muted mb-2">No wallet connected</p>
+          <p className="text-sm text-text-secondary">
+            Connect your wallet to view your position
+          </p>
+        </div>
+      </Card>
+    );
+  }
 
   // Calculate derived values
   const collateralUSD =
@@ -105,7 +147,7 @@ export function PositionSummarySimple({ data }: PositionSummarySimpleProps) {
             >
               {formatPercentage(ltv)}
             </p>
-            <Progress value={ltv} max={50} className="h-2 mt-2" isLTV />
+            <Progress value={ltv} max={50} className="h-2 mt-2" ltv />
             <p className="text-xs text-text-muted mt-1">Max 50%</p>
           </div>
 

@@ -5,8 +5,9 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { cn, truncateAddress } from '@/lib/utils';
+import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
+import { ConnectButton } from '@rainbow-me/rainbowkit';
 import {
   LayoutDashboard,
   Bitcoin,
@@ -18,8 +19,6 @@ import {
   ChevronLeft,
   Settings,
   HelpCircle,
-  LogOut,
-  Wallet,
   ArrowUpRight,
   BarChart3,
 } from 'lucide-react';
@@ -81,11 +80,6 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
   React.useEffect(() => {
     setMounted(true);
   }, []);
-
-  // Mock wallet state
-  const isConnected = true;
-  const address = '0x31F5a8b3C2308b72308A245b9A1e6e1a5F2e2308';
-  const balance = '0.059 BTC';
 
   if (!mounted) {
     return (
@@ -176,37 +170,73 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
           </div>
         </div>
 
-        {/* Wallet Info */}
-        {isConnected && (
-          <div className="p-4 border-b border-white/10">
-            <div
-              className={cn(
-                'p-3 rounded-xl bg-dark-background/50',
-                'flex items-center gap-3',
-                isCollapsed && 'justify-center'
-              )}
-            >
-              <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
-                <Wallet className="h-5 w-5 text-primary" />
-              </div>
-              <AnimatePresence>
-                {!isCollapsed && (
-                  <motion.div
-                    initial={{ opacity: 0, width: 0 }}
-                    animate={{ opacity: 1, width: 'auto' }}
-                    exit={{ opacity: 0, width: 0 }}
-                    className="overflow-hidden flex-1"
+        {/* Wallet Connection */}
+        <div className="p-4 border-b border-white/10">
+          <ConnectButton.Custom>
+            {({
+              account,
+              chain,
+              openAccountModal,
+              openChainModal,
+              openConnectModal,
+              mounted: buttonMounted,
+            }) => {
+              const connected = buttonMounted && account && chain;
+
+              if (!buttonMounted) return null;
+
+              if (!connected) {
+                return (
+                  <Button
+                    onClick={openConnectModal}
+                    className="w-full"
+                    variant="default"
                   >
-                    <p className="text-sm font-medium text-text-primary truncate">
-                      {truncateAddress(address)}
-                    </p>
-                    <p className="text-xs text-text-muted">{balance}</p>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-          </div>
-        )}
+                    Connect Wallet
+                  </Button>
+                );
+              }
+
+              if (chain.unsupported) {
+                return (
+                  <Button
+                    onClick={openChainModal}
+                    className="w-full"
+                    variant="destructive"
+                  >
+                    Wrong Network
+                  </Button>
+                );
+              }
+
+              return (
+                <div className={cn('space-y-2', isCollapsed && 'hidden')}>
+                  <Button
+                    onClick={openAccountModal}
+                    variant="outline"
+                    className="w-full justify-start text-left"
+                  >
+                    <div className="flex items-center gap-2 w-full min-w-0">
+                      <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
+                        <span className="text-xs font-bold">
+                          {account.displayName[0]}
+                        </span>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium truncate">
+                          {account.displayName}
+                        </p>
+                        <p className="text-xs text-text-muted truncate">
+                          {account.displayBalance}
+                        </p>
+                      </div>
+                    </div>
+                  </Button>
+                </div>
+              );
+            }}
+          </ConnectButton.Custom>
+        </div>
 
         {/* Main Navigation */}
         <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
@@ -303,31 +333,6 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
               </Link>
             );
           })}
-
-          {/* Disconnect Button */}
-          {isConnected && (
-            <Button
-              variant="ghost"
-              className={cn(
-                'w-full justify-start gap-3 text-text-muted hover:text-error',
-                isCollapsed && 'justify-center'
-              )}
-            >
-              <LogOut className="h-5 w-5" />
-              <AnimatePresence>
-                {!isCollapsed && (
-                  <motion.span
-                    initial={{ opacity: 0, width: 0 }}
-                    animate={{ opacity: 1, width: 'auto' }}
-                    exit={{ opacity: 0, width: 0 }}
-                    className="overflow-hidden whitespace-nowrap text-sm"
-                  >
-                    Disconnect
-                  </motion.span>
-                )}
-              </AnimatePresence>
-            </Button>
-          )}
         </div>
 
         {/* Stats Footer */}

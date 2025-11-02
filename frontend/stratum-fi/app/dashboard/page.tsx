@@ -8,7 +8,6 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { motion } from 'framer-motion';
 import { fadeInUp, staggerContainer } from '@/lib/constants';
-import { formatUSD, formatBTC } from '@/lib/utils';
 import {
   Bitcoin,
   DollarSign,
@@ -16,35 +15,21 @@ import {
   ArrowRight,
   ExternalLink,
   RefreshCw,
+  Loader2,
 } from 'lucide-react';
+import { useProtocolStats } from '@/lib/contracts';
+import { useAccount } from 'wagmi';
 
-/**
- * Simplified Dashboard - Only uses data available from smart contracts
- *
- * Data sources (from 05-check-status.ts):
- * - vaultController.balanceOf(user.address) → Collateral
- * - debtManager.userDebt(user.address) → Debt
- * - debtManager.getBorrowingCapacity() → Max borrow, available
- * - turboLoop.getSecondaryLP(user.address) → Turbo LP position
- * - harvester.getClaimableYield() → Claimable yield
- * - strategy.totalBTCDeposited() → Protocol total BTC
- * - debtManager.totalDebt() → Protocol total debt
- */
-export default function DashboardSimplePage() {
-  const [isLoading, setIsLoading] = React.useState(false);
+export default function DashboardPage() {
+  const { address: userAddress, isConnected } = useAccount();
+  const [isRefreshing, setIsRefreshing] = React.useState(false);
 
-  // Mock data - will be replaced with actual contract reads
-  const protocolStats = {
-    totalBTC: '0.0042',
-    totalDebt: '12.4',
-    activeUsers: 7,
-  };
+  const { stats: protocolStats, loading: statsLoading } = useProtocolStats();
 
-  const handleRefresh = async () => {
-    setIsLoading(true);
-    // Will call contract read functions here
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    setIsLoading(false);
+  const handleRefresh = () => {
+    setIsRefreshing(true);
+
+    window.location.reload();
   };
 
   return (
@@ -64,18 +49,27 @@ export default function DashboardSimplePage() {
             <div>
               <h1 className="text-3xl font-bold">Dashboard</h1>
               <p className="text-text-secondary mt-1">
-                Your self-repaying loan position
+                {isConnected
+                  ? 'Your self-repaying loan position'
+                  : 'Connect wallet to view your position'}
               </p>
+              {userAddress && (
+                <p className="text-xs text-text-muted mt-1 font-mono">
+                  {userAddress.slice(0, 6)}...{userAddress.slice(-4)}
+                </p>
+              )}
             </div>
             <div className="flex gap-3">
               <Button
                 variant="outline"
                 size="sm"
                 onClick={handleRefresh}
-                disabled={isLoading}
+                disabled={isRefreshing}
               >
                 <RefreshCw
-                  className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`}
+                  className={`h-4 w-4 mr-2 ${
+                    isRefreshing ? 'animate-spin' : ''
+                  }`}
                 />
                 Refresh
               </Button>
@@ -88,63 +82,61 @@ export default function DashboardSimplePage() {
             </div>
           </motion.div>
 
-          {/* Main Position Summary */}
-          <PositionSummarySimple />
+          {/* Main Position Summary - Real Contract Data */}
+          <PositionSummarySimple userAddress={userAddress} />
 
-          {/* Protocol Stats */}
+          {/* Protocol Stats - Real Contract Data */}
           <motion.div variants={fadeInUp}>
             <Card>
               <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle>Protocol Statistics</CardTitle>
-                <Badge variant="glass">Live Data</Badge>
+                <Badge variant="glass">Live from Mezo Testnet</Badge>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                  <div className="text-center p-4 rounded-lg bg-dark-surface/50">
-                    <div className="flex items-center justify-center gap-2 mb-2">
-                      <Bitcoin className="h-4 w-4 text-primary" />
-                      <span className="text-sm text-text-muted">
-                        Total BTC Locked
-                      </span>
-                    </div>
-                    <p className="text-2xl font-bold font-mono">
-                      {protocolStats.totalBTC} BTC
-                    </p>
-                    <p className="text-xs text-text-muted mt-1">
-                      From strategy.totalBTCDeposited()
-                    </p>
+                {statsLoading ? (
+                  <div className="flex items-center justify-center py-8">
+                    <Loader2 className="h-5 w-5 animate-spin text-primary" />
+                    <span className="ml-3 text-text-muted">
+                      Loading protocol stats...
+                    </span>
                   </div>
+                ) : protocolStats ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div className="text-center p-4 rounded-lg bg-dark-surface/50">
+                      <div className="flex items-center justify-center gap-2 mb-2">
+                        <Bitcoin className="h-4 w-4 text-primary" />
+                        <span className="text-sm text-text-muted">
+                          Total BTC Locked
+                        </span>
+                      </div>
+                      <p className="text-2xl font-bold font-mono">
+                        {protocolStats.totalBTC} BTC
+                      </p>
+                      <p className="text-xs text-text-muted mt-1">
+                        strategy.totalBTCDeposited()
+                      </p>
+                    </div>
 
-                  <div className="text-center p-4 rounded-lg bg-dark-surface/50">
-                    <div className="flex items-center justify-center gap-2 mb-2">
-                      <DollarSign className="h-4 w-4 text-secondary" />
-                      <span className="text-sm text-text-muted">
-                        Total Debt
-                      </span>
+                    <div className="text-center p-4 rounded-lg bg-dark-surface/50">
+                      <div className="flex items-center justify-center gap-2 mb-2">
+                        <DollarSign className="h-4 w-4 text-secondary" />
+                        <span className="text-sm text-text-muted">
+                          Total Debt Outstanding
+                        </span>
+                      </div>
+                      <p className="text-2xl font-bold font-mono">
+                        {protocolStats.totalDebt} bMUSD
+                      </p>
+                      <p className="text-xs text-text-muted mt-1">
+                        debtManager.totalDebt()
+                      </p>
                     </div>
-                    <p className="text-2xl font-bold font-mono">
-                      {protocolStats.totalDebt} bMUSD
-                    </p>
-                    <p className="text-xs text-text-muted mt-1">
-                      From debtManager.totalDebt()
-                    </p>
                   </div>
-
-                  <div className="text-center p-4 rounded-lg bg-dark-surface/50">
-                    <div className="flex items-center justify-center gap-2 mb-2">
-                      <TrendingUp className="h-4 w-4 text-success" />
-                      <span className="text-sm text-text-muted">
-                        Active Users
-                      </span>
-                    </div>
-                    <p className="text-2xl font-bold">
-                      {protocolStats.activeUsers}
-                    </p>
-                    <p className="text-xs text-text-muted mt-1">
-                      Using the protocol
-                    </p>
+                ) : (
+                  <div className="text-center py-8 text-text-muted">
+                    No protocol data available
                   </div>
-                </div>
+                )}
               </CardContent>
             </Card>
           </motion.div>
@@ -211,7 +203,7 @@ export default function DashboardSimplePage() {
                     asChild
                   >
                     <a
-                      href="https://explorer.mezo.org"
+                      href="https://explorer.testnet.mezo.org"
                       target="_blank"
                       rel="noopener noreferrer"
                     >
@@ -239,13 +231,13 @@ export default function DashboardSimplePage() {
                   </div>
                   <div className="flex-1">
                     <h3 className="font-semibold mb-1">
-                      Your Position is Self-Repaying
+                      📡 Live Contract Data
                     </h3>
                     <p className="text-sm text-text-secondary">
-                      Trading fees from your BTC in the MUSD/BTC pool
-                      automatically pay down your debt over time. No manual
-                      repayments needed, and your collateral can never be
-                      liquidated.
+                      This dashboard reads real-time data from deployed smart
+                      contracts on Mezo Testnet (Chain ID: 31611). Your position
+                      data is fetched directly from VaultController,
+                      DebtManager, TurboLoop, and Harvester contracts.
                     </p>
                   </div>
                 </div>
