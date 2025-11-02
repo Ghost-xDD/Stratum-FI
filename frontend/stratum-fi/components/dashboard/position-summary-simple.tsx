@@ -6,7 +6,13 @@ import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { formatUSD, formatPercentage, getLTVColor } from '@/lib/utils';
+import {
+  formatUSD,
+  formatPercentage,
+  getLTVColor,
+  formatTokenAmount,
+  parseAmount,
+} from '@/lib/utils';
 import { fadeInUp } from '@/lib/constants';
 import {
   Bitcoin,
@@ -84,12 +90,29 @@ export function PositionSummarySimple({
   }
 
   // Calculate derived values
+  const collateralBTCNum = parseAmount(position.collateralBTC);
+  const debtNum = parseAmount(position.debt);
+  const availableNum = parseAmount(position.available);
+  const secondaryLPNum = parseAmount(position.secondaryLP);
+  const claimableYieldNum = parseAmount(position.claimableYield);
+  const btcPriceUSDNum = parseAmount(position.btcPriceUSD);
+
   const collateralUSD =
-    parseFloat(position.collateralBTC) * position.btcPriceUSD;
-  const debtNum = parseFloat(position.debt);
-  const maxBorrowNum = parseFloat(position.maxBorrow);
-  const ltv = maxBorrowNum > 0 ? (debtNum / (collateralUSD / 2)) * 100 : 0; // LTV based on collateral
-  const hasTurboPosition = parseFloat(position.secondaryLP) > 0;
+    collateralBTCNum !== null && btcPriceUSDNum !== null
+      ? collateralBTCNum * btcPriceUSDNum
+      : null;
+
+  const ltv =
+    collateralUSD !== null && collateralUSD > 0 && debtNum !== null
+      ? (debtNum / (collateralUSD / 2)) * 100
+      : null; // LTV based on collateral
+
+  const hasTurboPosition = Boolean(secondaryLPNum && secondaryLPNum > 0);
+
+  const collateralBTCDisplay = formatTokenAmount(position.collateralBTC, 4);
+  const debtDisplay = formatTokenAmount(position.debt, 2);
+  const availableDisplay = formatTokenAmount(position.available, 2);
+  const secondaryLPDisplay = formatTokenAmount(position.secondaryLP, 2);
 
   return (
     <motion.div
@@ -108,10 +131,12 @@ export function PositionSummarySimple({
               <span className="text-sm text-text-muted">Collateral</span>
             </div>
             <p className="text-2xl font-bold font-mono">
-              {position.collateralBTC} BTC
+              {collateralBTCDisplay === '—'
+                ? '—'
+                : `${collateralBTCDisplay} BTC`}
             </p>
             <p className="text-sm text-text-secondary">
-              ≈ {formatUSD(collateralUSD)}
+              ≈ {collateralUSD !== null ? formatUSD(collateralUSD) : '—'}
             </p>
             <Badge variant="success" className="text-xs mt-2">
               Earning Yield
@@ -125,10 +150,10 @@ export function PositionSummarySimple({
               <span className="text-sm text-text-muted">Debt</span>
             </div>
             <p className="text-2xl font-bold font-mono">
-              {position.debt} bMUSD
+              {debtDisplay === '—' ? '—' : `${debtDisplay} bMUSD`}
             </p>
             <p className="text-sm text-text-secondary">
-              ≈ {formatUSD(debtNum)}
+              ≈ {debtNum !== null ? formatUSD(debtNum) : '—'}
             </p>
             <Badge variant="glass" className="text-xs mt-2">
               0% Interest
@@ -143,11 +168,11 @@ export function PositionSummarySimple({
             </div>
             <p
               className="text-2xl font-bold font-mono"
-              style={{ color: getLTVColor(ltv) }}
+              style={{ color: getLTVColor(ltv ?? 0) }}
             >
               {formatPercentage(ltv)}
             </p>
-            <Progress value={ltv} max={50} className="h-2 mt-2" ltv />
+            <Progress value={ltv ?? 0} max={50} className="h-2 mt-2" ltv />
             <p className="text-xs text-text-muted mt-1">Max 50%</p>
           </div>
 
@@ -158,10 +183,10 @@ export function PositionSummarySimple({
               <span className="text-sm text-text-muted">Available</span>
             </div>
             <p className="text-2xl font-bold font-mono text-success">
-              {position.available}
+              {availableDisplay === '—' ? '—' : `${availableDisplay} bMUSD`}
             </p>
             <p className="text-sm text-text-secondary">
-              ≈ {formatUSD(parseFloat(position.available))}
+              ≈ {availableNum !== null ? formatUSD(availableNum) : '—'}
             </p>
             <p className="text-xs text-text-muted mt-2">Can borrow</p>
           </div>
@@ -182,7 +207,7 @@ export function PositionSummarySimple({
 
           <div className="mb-4">
             <p className="text-3xl font-bold number-glow mb-1">
-              {formatUSD(parseFloat(position.claimableYield))}
+              {claimableYieldNum !== null ? formatUSD(claimableYieldNum) : '—'}
             </p>
             <p className="text-sm text-text-muted">
               From trading fees in your LP position
@@ -218,7 +243,7 @@ export function PositionSummarySimple({
               <p className="text-sm text-text-muted mb-2">
                 Secondary LP Position
               </p>
-              <p className="text-3xl font-bold mb-1">{position.secondaryLP}</p>
+              <p className="text-3xl font-bold mb-1">{secondaryLPDisplay}</p>
               <p className="text-sm text-text-secondary mb-4">
                 bMUSD/MUSD LP tokens
               </p>

@@ -1,29 +1,28 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 25 95% 53%;
-    --primary-foreground: 222.2 47.4% 1.2%;
-    --secondary: 178.6 98% 25.7%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 25 95% 53%;
+    --background: 0 0% 5%;
+    --foreground: 214 20% 95%;
+    --card: 235 10% 9%;
+    --card-foreground: 214 20% 95%;
+    --popover: 235 10% 12%;
+    --popover-foreground: 214 20% 95%;
+    --primary: 84 81% 59%;
+    --primary-foreground: 240 18% 8%;
+    --secondary: 228 14% 16%;
+    --secondary-foreground: 216 19% 88%;
+    --muted: 230 12% 22%;
+    --muted-foreground: 215 13% 68%;
+    --accent: 227 18% 20%;
+    --accent-foreground: 214 20% 95%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 214 20% 95%;
+    --border: 228 12% 24%;
+    --input: 228 12% 24%;
+    --ring: 84 81% 59%;
     --radius: 16px;
   }
 
@@ -36,6 +35,21 @@
     font-feature-settings: 'rlig' 1, 'calt' 1;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    letter-spacing: 0.005em;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-display text-text-primary;
+    letter-spacing: -0.01em;
+  }
+
+  p {
+    @apply text-base font-sans text-text-secondary;
   }
 
   ::selection {

@@ -52,9 +52,14 @@ export function useUserPosition(userAddress?: string) {
   const [position, setPosition] = useState<UserPosition | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    if (!userAddress) {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted || !userAddress) {
       setLoading(false);
       return;
     }
@@ -84,12 +89,12 @@ export function useUserPosition(userAddress?: string) {
           debtManager.getBorrowingCapacity(userAddress), // Line 54-55
         ]);
 
-        const [maxBorrow, currentDebt, available] = borrowingCapacity;
+        const [maxBorrow, , available] = borrowingCapacity;
 
         // Calculate LTV (line 63-65)
         let ltv = 0;
-        if (maxBorrow > 0n) {
-          ltv = Number((userDebt * 10000n) / maxBorrow) / 100;
+        if (maxBorrow > BigInt(0)) {
+          ltv = Number((userDebt * BigInt(10000)) / maxBorrow) / 100;
         }
 
         setPosition({
@@ -108,7 +113,7 @@ export function useUserPosition(userAddress?: string) {
     }
 
     fetchPosition();
-  }, [userAddress]);
+  }, [mounted, userAddress]);
 
   return { position, loading, error };
 }
@@ -121,9 +126,14 @@ export function useTurboPosition(userAddress?: string) {
   const [position, setPosition] = useState<TurboPosition | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    if (!userAddress) {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted || !userAddress) {
       setLoading(false);
       return;
     }
@@ -154,7 +164,7 @@ export function useTurboPosition(userAddress?: string) {
     }
 
     fetchTurboPosition();
-  }, [userAddress]);
+  }, [mounted, userAddress]);
 
   return { position, loading, error };
 }
@@ -166,9 +176,15 @@ export function useTurboPosition(userAddress?: string) {
 export function useClaimableYield() {
   const [yieldData, setYieldData] = useState<YieldData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
+
     async function fetchYield() {
       try {
         setLoading(true);
@@ -180,8 +196,10 @@ export function useClaimableYield() {
           provider
         );
 
-        // Line 76
-        const [claimable0, claimable1] = await harvester.getClaimableYield();
+        // Line 76 - Try to get claimable yield
+        const result = await harvester.getClaimableYield();
+        const claimable0 = result[0];
+        const claimable1 = result[1];
 
         const total0 = parseFloat(ethers.formatEther(claimable0));
         const total1 = parseFloat(ethers.formatEther(claimable1));
@@ -193,7 +211,7 @@ export function useClaimableYield() {
         });
       } catch (err) {
         console.error('Error fetching claimable yield:', err);
-        // Line 79-80: Not yet available
+        // Line 79-80: Not yet available (no trades in pool yet)
         setYieldData({
           claimable0: '0',
           claimable1: '0',
@@ -205,9 +223,9 @@ export function useClaimableYield() {
     }
 
     fetchYield();
-  }, []);
+  }, [mounted]);
 
-  return { yieldData, loading, error };
+  return { yieldData, loading };
 }
 
 /**
@@ -218,8 +236,15 @@ export function useProtocolStats() {
   const [stats, setStats] = useState<ProtocolStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
+
     async function fetchStats() {
       try {
         setLoading(true);
@@ -256,7 +281,7 @@ export function useProtocolStats() {
     }
 
     fetchStats();
-  }, []);
+  }, [mounted]);
 
   return { stats, loading, error };
 }
@@ -268,9 +293,14 @@ export function useBTCBalance(userAddress?: string) {
   const [balance, setBalance] = useState<string>('0');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    if (!userAddress) {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted || !userAddress) {
       setLoading(false);
       return;
     }
@@ -297,7 +327,99 @@ export function useBTCBalance(userAddress?: string) {
     }
 
     fetchBalance();
-  }, [userAddress]);
+  }, [mounted, userAddress]);
+
+  return { balance, loading, error };
+}
+
+/**
+ * Hook to read user's MUSD balance
+ */
+export function useMUSDBalance(userAddress?: string) {
+  const [balance, setBalance] = useState<string>('0');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted || !userAddress) {
+      setLoading(false);
+      return;
+    }
+
+    async function fetchBalance() {
+      try {
+        setLoading(true);
+        const provider = getProvider();
+
+        const musdToken = new ethers.Contract(
+          TOKEN_ADDRESSES.MUSD,
+          ERC20_ABI,
+          provider
+        );
+
+        const bal = await musdToken.balanceOf(userAddress);
+        setBalance(ethers.formatEther(bal));
+      } catch (err) {
+        console.error('Error fetching MUSD balance:', err);
+        setError(err as Error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchBalance();
+  }, [mounted, userAddress]);
+
+  return { balance, loading, error };
+}
+
+/**
+ * Hook to read user's bMUSD balance
+ */
+export function useBMUSDBalance(userAddress?: string) {
+  const [balance, setBalance] = useState<string>('0');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted || !userAddress) {
+      setLoading(false);
+      return;
+    }
+
+    async function fetchBalance() {
+      try {
+        setLoading(true);
+        const provider = getProvider();
+
+        const bmusdToken = new ethers.Contract(
+          CONTRACT_ADDRESSES.bMUSD,
+          ERC20_ABI,
+          provider
+        );
+
+        const bal = await bmusdToken.balanceOf(userAddress);
+        setBalance(ethers.formatEther(bal));
+      } catch (err) {
+        console.error('Error fetching bMUSD balance:', err);
+        setError(err as Error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchBalance();
+  }, [mounted, userAddress]);
 
   return { balance, loading, error };
 }
@@ -324,11 +446,6 @@ export function useDashboardData(userAddress?: string) {
       yields.loading ||
       protocol.loading ||
       btcBalance.loading,
-    error:
-      position.error ||
-      turbo.error ||
-      yields.error ||
-      protocol.error ||
-      btcBalance.error,
+    error: position.error || turbo.error || protocol.error || btcBalance.error,
   };
 }

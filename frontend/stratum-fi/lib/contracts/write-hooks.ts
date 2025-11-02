@@ -102,3 +102,71 @@ export function useBorrowBMUSD() {
     error,
   };
 }
+
+/**
+ * Hook to approve tokens for TurboLoop
+ */
+export function useApproveTurbo() {
+  const { writeContractAsync } = useWriteContract();
+
+  const approve = async (tokenAddress: string, amount: string = 'max') => {
+    const approvalAmount =
+      amount === 'max'
+        ? BigInt(
+            '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
+          )
+        : parseEther(amount);
+
+    return await writeContractAsync({
+      address: tokenAddress as `0x${string}`,
+      abi: ERC20_ABI,
+      functionName: 'approve',
+      args: [CONTRACT_ADDRESSES.TurboLoopReal, approvalAmount],
+    });
+  };
+
+  return { approve };
+}
+
+/**
+ * Hook to execute Turbo Loop
+ */
+export function useExecuteTurboLoop() {
+  const {
+    writeContractAsync,
+    data: hash,
+    isPending,
+    error,
+  } = useWriteContract();
+  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
+    hash,
+  });
+
+  const executeTurbo = async (bmusdAmount: string, musdAmount: string) => {
+    return await writeContractAsync({
+      address: CONTRACT_ADDRESSES.TurboLoopReal as `0x${string}`,
+      abi: [
+        {
+          inputs: [
+            { name: 'bmusdAmount', type: 'uint256' },
+            { name: 'musdAmount', type: 'uint256' },
+          ],
+          name: 'loop',
+          outputs: [{ name: '', type: 'uint256' }],
+          stateMutability: 'nonpayable',
+          type: 'function',
+        },
+      ] as const,
+      functionName: 'loop',
+      args: [parseEther(bmusdAmount), parseEther(musdAmount)],
+    });
+  };
+
+  return {
+    executeTurbo,
+    hash,
+    isPending: isPending || isConfirming,
+    isSuccess,
+    error,
+  };
+}

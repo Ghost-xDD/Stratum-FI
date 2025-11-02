@@ -5,7 +5,46 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+export function isFiniteNumber(value: unknown): value is number {
+  return typeof value === 'number' && Number.isFinite(value);
+}
+
+export function parseAmount(
+  value: string | number | null | undefined
+): number | null {
+  if (value === null || value === undefined) {
+    return null;
+  }
+
+  const numericValue =
+    typeof value === 'string' ? parseFloat(value) : Number(value);
+
+  if (!Number.isFinite(numericValue)) {
+    return null;
+  }
+
+  return numericValue;
+}
+
+export function formatTokenAmount(
+  value: string | number | null | undefined,
+  decimals: number = 2,
+  fallback: string = '—'
+): string {
+  const numericValue = parseAmount(value);
+
+  if (numericValue === null) {
+    return fallback;
+  }
+
+  return numericValue.toFixed(decimals);
+}
+
 export function formatNumber(num: number, decimals: number = 2): string {
+  if (!Number.isFinite(num)) {
+    return '—';
+  }
+
   if (num >= 1e9) {
     return (num / 1e9).toFixed(decimals) + 'B';
   }
@@ -28,11 +67,22 @@ export function formatUSD(amount: number): string {
 }
 
 export function formatBTC(amount: number, decimals: number = 6): string {
+  if (!Number.isFinite(amount)) {
+    return '— BTC';
+  }
+
   return amount.toFixed(decimals) + ' BTC';
 }
 
-export function formatPercentage(value: number): string {
-  return value.toFixed(1) + '%';
+export function formatPercentage(
+  value: number | null | undefined,
+  decimals: number = 1
+): string {
+  if (!Number.isFinite(value ?? NaN)) {
+    return '—';
+  }
+
+  return (value as number).toFixed(decimals) + '%';
 }
 
 export function truncateAddress(address: string): string {
