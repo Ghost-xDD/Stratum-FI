@@ -58,21 +58,38 @@ Turbo Loop Interface
   - Visual diagram showing:
     * Primary yield → pays debt
     * Secondary yield → your profit
-  - Input: Additional bMUSD to loop
-  - Input: MUSD to pair (1:1 ratio)
+
+  ⚠️ Prerequisites Check:
+  ┌─────────────────────────────┐
+  │ You need:                   │
+  │ ✓ bMUSD (from borrowing)    │
+  │ ✓ MUSD (1:1 ratio)          │
+  │                             │
+  │ Your balances:              │
+  │ bMUSD: 1.06                 │
+  │ MUSD: 1,858.97              │
+  └─────────────────────────────┘
+
+  If missing MUSD:
+  → Show button: "Get MUSD" (links to mezo.org or swap)
+
+  - Input: bMUSD amount to loop
+  - Input: MUSD to pair (must match 1:1)
   - Shows expected LP tokens
-  - Button: "Activate Turbo Mode"
+  - Button: "Activate Turbo Mode" (disabled if missing MUSD)
   ↓
 Confirmation Modal
-  - Summary of operations
+  - Summary: "You're providing X bMUSD + X MUSD"
+  - Expected: "~X LP tokens in bMUSD/MUSD pool"
+  - Outcome: "Earn ~8.3% APR on top of primary yield"
   - Gas estimate
-  - Expected outcome
   ↓
 Transaction confirms
   ↓
 Dashboard shows BOTH yield sources
-  - Chart comparing yields
+  - Chart comparing yields (side by side)
   - Separate tracking for each pool
+  - Combined APR display
 ```
 
 ---
@@ -278,6 +295,18 @@ Numbers: JetBrains Mono (monospace), 16-32px
 │  │  bMUSD/MUSD Pool ──→ Extra profit! │    │
 │  └────────────────────────────────────┘    │
 │                                             │
+│  ⚠️ YOU NEED MUSD!                          │
+│  Turbo Loop requires you to provide MUSD   │
+│  to pair with your bMUSD (1:1 ratio)       │
+│                                             │
+│  ┌─────────────────────────────────┐       │
+│  │ Your MUSD: 1,858.97             │       │
+│  │ ✅ Sufficient for Turbo         │       │
+│  │                                 │       │
+│  │ Don't have MUSD?                │       │
+│  │ [Get MUSD →] mezo.org           │       │
+│  └─────────────────────────────────┘       │
+│                                             │
 │  Input Your Amounts:                        │
 │  ┌─────────────────────────────────┐       │
 │  │ bMUSD: [________] bMUSD         │       │
@@ -286,17 +315,22 @@ Numbers: JetBrains Mono (monospace), 16-32px
 │                                             │
 │  ┌─────────────────────────────────┐       │
 │  │ MUSD:  [________] MUSD          │       │
-│  │ (Match bMUSD 1:1)               │       │
+│  │ (Must match bMUSD 1:1)          │       │
 │  │ Balance: 1,858 MUSD       [Max] │       │
+│  │ ↑ Auto-fills to match bMUSD     │       │
 │  └─────────────────────────────────┘       │
+│                                             │
+│  What Happens:                              │
+│  1. You provide: bMUSD + MUSD              │
+│  2. Added to bMUSD/MUSD pool on Tigris     │
+│  3. You receive: LP tokens                 │
+│  4. Earn: ~8.3% APR in trading fees        │
 │                                             │
 │  Expected Returns:                          │
 │  • LP Tokens: ~2.12                        │
 │  • APR: ~8.3%                              │
 │  • Daily Earnings: ~$0.02                  │
-│                                             │
-│  ⚠️ Advanced Strategy                      │
-│  Requires both bMUSD and MUSD              │
+│  • This is EXTRA yield (debt still repaid) │
 │                                             │
 │  [Cancel]  [Activate Turbo Mode 🚀]        │
 │                                             │
@@ -472,12 +506,18 @@ TigrisPool.getReserves() → (reserve0, reserve1, timestamp)
 **Write Functions (Require transactions):**
 
 ```typescript
-// User actions
+// User actions - Basic Flow
 BTC.approve(VaultController, amount) → Approval
 VaultController.deposit(amount) → Deposit BTC
 DebtManager.borrow(amount) → Borrow bMUSD
-TurboLoop.loop(bmusdAmount, musdAmount) → Enter secondary LP
-Harvester.harvest() → Collect yield (keeper only)
+
+// User actions - Turbo Loop (requires MUSD!)
+bMUSD.approve(TurboLoop, amount) → Approve bMUSD
+MUSD.approve(TurboLoop, amount) → Approve MUSD (⚠️ user must have!)
+TurboLoop.loop(bmusdAmount, musdAmount) → Enter bMUSD/MUSD LP
+
+// Keeper actions
+Harvester.harvest() → Collect yield (anyone can call)
 ```
 
 ### Error Handling
@@ -1323,45 +1363,107 @@ const amount = 0.001; // number (precision issues!)
 
 ---
 
-## 🎬 Sample User Journey
+## 🎬 Sample User Journey (Aligned with Scripts)
 
 ```
 Alice visits stratum.fi
-  ↓ Sees clear value prop
+  ↓ Sees clear value prop: "Self-Repaying Loans on Bitcoin"
 Clicks "Get Started"
   ↓ Connects MetaMask
-Prompted to switch to Mezo
+Prompted to switch to Mezo (Chain ID: 31611)
   ↓ Confirms network switch
 Sees dashboard (empty state)
-  ↓ Clicks "Deposit BTC"
-Modal opens with explanation
-  ↓ Enters 0.001 BTC
+  ↓ Banner: "Deposit BTC to get started"
+
+━━━ STEP 1: DEPOSIT (npm run deposit) ━━━
+Clicks "Deposit BTC"
+  ↓ Modal opens with explanation
+Enters 0.0001 BTC
+  Shows: "Your BTC will earn ~12.5% APR in MUSD/BTC pool"
+  Shows: "You can borrow up to $5.25 (50% LTV)"
 Clicks "Deposit & Earn"
-  ↓ Signs transaction
-Transaction pending (shows spinner)
+  ↓ Signs BTC approval
+  ↓ Signs deposit transaction
+Transaction pending (shows spinner + explorer link)
   ↓ Confirms on-chain
-Success! Confetti animation
-  ↓ Dashboard updates
-Now sees: "You can borrow up to $5.25"
-  ↓ Clicks "Borrow"
-Slider to choose amount
-  ↓ Selects 80% ($4.20)
-Sees timeline: "Debt free in ~120 days"
-  ↓ Clicks "Borrow bMUSD"
+Success! Confetti animation 🎉
+  ↓ Dashboard updates in real-time
+Shows: "💎 Collateral: 0.0001 BTC ($10.51)"
+Shows: "🎯 You can borrow up to $5.25"
+
+━━━ STEP 2: BORROW (npm run borrow) ━━━
+Clicks "Borrow bMUSD" button
+  ↓ Modal opens
+Slider to choose amount (0% - 100% of max)
+  ↓ Drags to 80%
+Shows: "4.2 bMUSD ≈ $4.20"
+Shows: "LTV: 80% (Healthy)"
+Shows projection: "Debt free in ~120 days at current APR"
+Clicks "Borrow bMUSD"
+  ↓ Signs transaction
 Transaction confirms
-  ↓ Success!
-Notices "Turbo Mode" badge
+  ↓ Success! Now has 4.2 bMUSD in wallet
+Dashboard updates:
+  Shows: "💸 Debt: 4.2 bMUSD (80% LTV)"
+  Shows: "🌾 Yield accruing: $0.03/day"
+
+━━━ STEP 3: TURBO (npm run turbo) - OPTIONAL ━━━
+Notices "Turbo Mode" badge (pulsing glow)
   ↓ Curious, clicks it
-Sees explainer: "2x your yield"
-  ↓ Decides to try
-Enters amounts (guided by UI)
-  ↓ Activates Turbo
-Now earning from BOTH pools!
-  ↓ Checks back next day
-Sees yield accumulating
-  ↓ Returns weekly
-Watches debt decrease automatically
+Modal explains: "Earn from a SECOND yield source!"
+  Shows diagram: Primary yield → debt | Turbo yield → profit
+
+⚠️ Checks requirements:
+  ✓ bMUSD: Has 4.2 bMUSD
+  ❌ MUSD: Needs MUSD to pair (1:1)
+
+Sees banner: "You need MUSD for Turbo Mode"
+  ↓ Clicks "Get MUSD" button
+Redirected to mezo.org
+  ↓ Mints 100 MUSD (deposits BTC)
+Returns to Stratum Fi
+
+Now requirements met:
+  ✓ bMUSD: 4.2 bMUSD
+  ✓ MUSD: 100 MUSD
+
+Enters Turbo amounts:
+  bMUSD: 1.0 (leaves 3.2 for safety)
+  MUSD: 1.0 (auto-filled to match)
+
+Shows: "Expected: 1.0 LP tokens earning ~8.3% APR"
+Clicks "Activate Turbo Mode 🚀"
+  ↓ Step 1/3: Borrows 1.0 more bMUSD (signs)
+  ↓ Step 2/3: Approves bMUSD (signs)
+  ↓ Step 3/3: Approves MUSD (signs)
+  ↓ Executes TurboLoop (signs)
+All transactions batch confirm
+  ↓ Success! Confetti 🎊
+
+Dashboard NOW shows TWO yield sources:
+┌───────────────────┬───────────────────┐
+│ Primary (MUSD/BTC)│ Turbo (bMUSD/MUSD)│
+│ APR: 12.5%        │ APR: 8.3%         │
+│ Pays debt ✓       │ Your profit ✓     │
+│ $0.03/day         │ $0.02/day         │
+└───────────────────┴───────────────────┘
+
+Total Daily Earnings: $0.05
+Debt Repayment: $0.03/day
+Your Profit: $0.02/day
+
+━━━ ONGOING: AUTOMATIC REPAYMENT ━━━
+Day 1:  Debt $5.25 → Yield $0.03
+Day 7:  Debt $5.04 → Yield $0.21
+Day 30: Debt $4.35 → Yield $0.90
+  ↓ Checks weekly
+Watches debt decrease on timeline chart
+Sees extra MUSD accumulating from Turbo
+  ↓ Day 120
+Debt fully paid! 🎉
+Still has LP tokens earning yield
   ↓ Becomes long-term user!
+Tells friends about Stratum Fi
 ```
 
 ---
@@ -1397,7 +1499,10 @@ How does it work?
 "Your BTC becomes liquidity on Tigris DEX, earning trading fees. Those fees pay down your debt automatically. Over time, your debt goes to zero and you keep all the profit."
 
 What is Turbo Mode?
-"Leverage your position to earn from a second yield source. Your primary yield still pays your debt, but now you're earning extra profit on top."
+"Provide both bMUSD (your borrowed debt) and MUSD to create a second liquidity position. Earn extra yield on top of your primary yield. Your debt still gets repaid, but now you're earning additional profit!"
+
+Where do I get MUSD?
+"You can mint MUSD on mezo.org by depositing BTC, or swap for it on Tigris DEX. You need MUSD to activate Turbo Mode (1:1 ratio with bMUSD)."
 ```
 
 ---

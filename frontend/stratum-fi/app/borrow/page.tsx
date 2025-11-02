@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Header } from '@/components/layout/header';
+import { DashboardLayout } from '@/components/layout/dashboard-layout';
 import { BorrowModal } from '@/components/modals/borrow-modal';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -30,9 +30,7 @@ export default function BorrowPage() {
   const position = MOCK_DATA.userPosition;
 
   return (
-    <>
-      <Header />
-      <main className="flex-1 bg-dark-background">
+    <DashboardLayout>
         <div className="container mx-auto px-4 py-8 max-w-4xl">
           <motion.div
             initial="initial"
@@ -204,9 +202,7 @@ export default function BorrowPage() {
             </motion.div>
           </motion.div>
         </div>
-      </main>
-
       <BorrowModal isOpen={modalOpen} onClose={() => setModalOpen(false)} />
-    </>
+    </DashboardLayout>
   );
 }

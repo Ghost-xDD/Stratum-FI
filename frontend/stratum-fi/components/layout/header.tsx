@@ -10,8 +10,7 @@ import { Menu, X } from 'lucide-react';
 
 const navItems = [
   { href: '/dashboard', label: 'Dashboard' },
-  { href: '/deposit', label: 'Deposit' },
-  { href: '/borrow', label: 'Borrow' },
+  { href: '/vault', label: 'Vault' },
   { href: '/turbo', label: 'Turbo', badge: 'Advanced' },
   { href: '/harvest', label: 'Harvest' },
 ];
