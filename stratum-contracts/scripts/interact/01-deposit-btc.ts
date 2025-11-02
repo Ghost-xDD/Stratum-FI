@@ -18,8 +18,8 @@ async function main() {
   const btcAddress = '0x7b7C000000000000000000000000000000000000';
   const btc = await ethers.getContractAt('IERC20', btcAddress);
 
-  // Amount to deposit (0.0001 BTC = 10,000 sats)
-  const depositAmount = ethers.parseEther('0.0001');
+  // Amount to deposit - 0.017 BTC to increase capacity for 500 bMUSD borrow
+  const depositAmount = ethers.parseEther('0.017');
 
   console.log('\n📥 Depositing BTC...');
   console.log('Amount:', ethers.formatEther(depositAmount), 'BTC');
@@ -51,6 +51,19 @@ async function main() {
     '\n💰 Your total deposits:',
     ethers.formatEther(userDeposit),
     'BTC'
+  );
+
+  // Show expected borrowing capacity
+  const debtManagerAddress = deployedAddresses['StratumFiFinal#DebtManager'];
+  const debtManager = await ethers.getContractAt(
+    'DebtManager',
+    debtManagerAddress
+  );
+  const [maxBorrow] = await debtManager.getBorrowingCapacity(user.address);
+  console.log(
+    '\n📊 Your borrowing capacity:',
+    ethers.formatEther(maxBorrow),
+    'bMUSD (max at 50% LTV)'
   );
 }
 

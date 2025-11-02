@@ -35,8 +35,8 @@ async function main() {
     mockSwapAddress || 'Not deployed (using real pools)'
   );
 
-  // Amounts to fund (testnet amounts)
-  const strategyAmount = ethers.parseEther('2'); // 2 MUSD for LP pairing (need ~1.05 per 0.0001 BTC)
+  // Amounts to fund (increased for larger deposits)
+  const strategyAmount = ethers.parseEther('1000'); // 1000 MUSD for LP pairing with BTC deposits
   const mockSwapAmount = ethers.parseEther('10'); // 10 MUSD for swaps
 
   const totalNeeded = strategyAmount + mockSwapAmount;

@@ -15,7 +15,7 @@ async function main() {
 
   console.log('\n💸 Funding StrategyBTC with More MUSD\n');
 
-  const amount = ethers.parseEther('20'); // 20 MUSD
+  const amount = ethers.parseEther('1000'); // 1000 MUSD for larger deposits
 
   const balance = await musd.balanceOf(admin.address);
   console.log('Your MUSD:', ethers.formatEther(balance));

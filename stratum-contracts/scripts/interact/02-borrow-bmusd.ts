@@ -36,8 +36,18 @@ async function main() {
     return;
   }
 
-  // Borrow 80% of available capacity
-  const borrowAmount = (available * 80n) / 100n;
+  // Borrow specific amount (500 bMUSD)
+  const borrowAmount = ethers.parseEther('500');
+
+  // Check if we have enough capacity
+  if (borrowAmount > available) {
+    console.error('❌ Not enough borrowing capacity!');
+    console.log('   Requested:', ethers.formatEther(borrowAmount), 'bMUSD');
+    console.log('   Available:', ethers.formatEther(available), 'bMUSD');
+    console.log('   Need to deposit more BTC to increase capacity');
+    return;
+  }
+
   console.log('\n💸 Borrowing:', ethers.formatEther(borrowAmount), 'bMUSD');
 
   const borrowTx = await debtManager.borrow(borrowAmount);
