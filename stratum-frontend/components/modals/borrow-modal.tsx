@@ -22,7 +22,6 @@ import {
   getLTVColor,
 } from '@/lib/utils';
 import { MOCK_DATA } from '@/lib/constants';
-import { motion } from 'framer-motion';
 import { DollarSign, Calendar, AlertCircle, CheckCircle } from 'lucide-react';
 
 interface BorrowModalProps {
