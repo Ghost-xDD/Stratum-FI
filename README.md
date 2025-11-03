@@ -3,6 +3,8 @@
 
 # StratumFi
 
+![PHOTO-2025-11-03-11-30-08](https://github.com/user-attachments/assets/e201b4d9-eb22-43b8-b6e0-93cef1259587)
+
 > **Self-repaying loans for Bitcoin. Built on Mezo.**
 
 StratumFi transforms idle Bitcoin into productive, self-repaying assets—the first protocol to bring Alchemix-style yield-backed loans to the largest asset in crypto.
