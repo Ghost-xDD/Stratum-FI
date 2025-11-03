@@ -1,11 +1,14 @@
+[![Mezo Testnet](https://img.shields.io/badge/Mezo-Testnet-lime?style=flat-square)](https://explorer.test.mezo.org)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](LICENSE)
+
 # StratumFi
 
 > **Self-repaying loans for Bitcoin. Built on Mezo.**
 
 StratumFi transforms idle Bitcoin into productive, self-repaying assets—the first protocol to bring Alchemix-style yield-backed loans to the largest asset in crypto.
 
-[![Mezo Testnet](https://img.shields.io/badge/Mezo-Testnet-lime?style=flat-square)](https://explorer.test.mezo.org)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](LICENSE)
+- [Litepaper](https://drive.google.com/file/d/1Ptzp-ohBxB8-5KRjzTb2URhSqp0sPCIP/view?usp=sharing)
+- [Website](https://stratumfi.xyz)
 
 ---
 
