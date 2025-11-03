@@ -9,6 +9,7 @@ StratumFi transforms idle Bitcoin into productive, self-repaying assets—the fi
 
 - [Litepaper](https://drive.google.com/file/d/1Ptzp-ohBxB8-5KRjzTb2URhSqp0sPCIP/view?usp=sharing)
 - [Website](https://stratumfi.xyz)
+- [PitchDeck](https://gamma.app/docs/StratumFi-nvnkkzhiild016h)
 
 ---
 
