@@ -88,12 +88,20 @@ DRY_RUN=false
 
 ## Step 3: Run the Bot
 
+**Using Make (recommended):**
+
+```bash
+make run
+```
+
+**Or manually:**
+
 ```bash
 # Create logs directory
 mkdir -p logs
 
 # Start keeper bot
-python keeper.py
+python main.py
 ```
 
 You should see:
@@ -147,7 +155,7 @@ Press **Ctrl+C** or send SIGTERM:
 
 ```bash
 # Graceful shutdown
-kill -TERM $(pgrep -f keeper.py)
+kill -TERM $(pgrep -f main.py)
 ```
 
 The bot will log a shutdown summary:
@@ -165,16 +173,17 @@ Last Harvest: 2024-11-03T15:32:25
 **Build and run with Docker Compose:**
 
 ```bash
-# Build image
+# Using Make
+make docker-build
+make docker-up
+make docker-logs  # View logs
+make docker-down  # Stop
+
+# Or manually
+cd scripts
 docker-compose build
-
-# Start keeper (and optional Prometheus/Grafana)
 docker-compose up -d
-
-# View logs
 docker-compose logs -f keeper
-
-# Stop
 docker-compose down
 ```
 

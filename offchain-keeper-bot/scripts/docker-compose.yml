@@ -2,19 +2,21 @@ version: '3.8'
 
 services:
   keeper:
-    build: .
+    build:
+      context: ..
+      dockerfile: scripts/Dockerfile
     container_name: stratum-keeper-bot
     restart: unless-stopped
     env_file:
-      - .env
+      - ../.env
     environment:
       - PYTHONUNBUFFERED=1
     ports:
       - '8000:8000' # Prometheus metrics
       - '8080:8080' # Health checks
     volumes:
-      - ./logs:/app/logs
-      - ../frontend/stratum-fi/abi:/app/abi:ro # Mount ABIs as read-only
+      - ../logs:/app/logs
+      - ../../frontend/stratum-fi/abi:/app/abi:ro # Mount ABIs as read-only
     networks:
       - stratum-network
     logging:

@@ -16,12 +16,8 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application code
-COPY config.py .
-COPY logger.py .
-COPY metrics.py .
-COPY contracts.py .
-COPY keeper.py .
-COPY health_check.py .
+COPY src/ ./src/
+COPY main.py .
 
 # Create logs directory
 RUN mkdir -p /app/logs
@@ -41,5 +37,5 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
     CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8080/health')"
 
 # Run keeper bot
-CMD ["python", "-u", "keeper.py"]
+CMD ["python", "-u", "main.py"]
 
