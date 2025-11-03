@@ -23,13 +23,7 @@ import {
 } from '@/lib/utils';
 import { MOCK_DATA } from '@/lib/constants';
 import { motion } from 'framer-motion';
-import {
-  DollarSign,
-  Percent,
-  Calendar,
-  AlertCircle,
-  CheckCircle,
-} from 'lucide-react';
+import { DollarSign, Calendar, AlertCircle, CheckCircle } from 'lucide-react';
 
 interface BorrowModalProps {
   isOpen: boolean;

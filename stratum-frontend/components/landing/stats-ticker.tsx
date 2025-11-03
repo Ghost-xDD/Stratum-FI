@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { formatUSD, formatNumber } from '@/lib/utils';
+import { formatUSD } from '@/lib/utils';
 import { MOCK_DATA } from '@/lib/constants';
 import { TrendingUp, Users, DollarSign, Percent } from 'lucide-react';
 

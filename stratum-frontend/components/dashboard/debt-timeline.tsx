@@ -111,7 +111,7 @@ export function DebtTimeline() {
                     borderRadius: '8px',
                   }}
                   labelStyle={{ color: '#F8FAFC' }}
-                  formatter={(value: any) => formatUSD(value)}
+                  formatter={(value: number) => formatUSD(value)}
                 />
                 <Line
                   type="monotone"

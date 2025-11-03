@@ -16,7 +16,7 @@ import { Card } from '@/components/ui/card';
 import { formatBTC, formatUSD } from '@/lib/utils';
 import { MOCK_DATA } from '@/lib/constants';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Bitcoin, TrendingUp, Shield, Info } from 'lucide-react';
+import { Bitcoin, TrendingUp, Info } from 'lucide-react';
 
 interface DepositModalProps {
   isOpen: boolean;

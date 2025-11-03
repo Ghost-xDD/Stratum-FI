@@ -6,7 +6,6 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import {
   WalletIcon,
-  ArrowDownIcon,
   CoinsIcon,
   TrendingUpIcon,
   CheckCircle,
@@ -68,7 +67,7 @@ export function HowItWorksSection() {
               How <span className="gradient-text">Stratum Fi</span> Works
             </h2>
             <p className="text-xl text-text-secondary max-w-3xl mx-auto">
-              Four simple steps to unlock your Bitcoin's earning potential
+              Four simple steps to unlock your Bitcoin&apos;s earning potential
               without selling
             </p>
           </motion.div>

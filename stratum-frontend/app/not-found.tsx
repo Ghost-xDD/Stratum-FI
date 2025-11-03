@@ -30,8 +30,8 @@ export default function NotFound() {
         {/* Message */}
         <h2 className="text-2xl font-semibold mb-4">Page Not Found</h2>
         <p className="text-text-secondary mb-8">
-          The page you're looking for doesn't exist or has been moved to a new
-          location.
+          The page you&apos;re looking for doesn&apos;t exist or has been moved
+          to a new location.
         </p>
 
         {/* CTAs */}

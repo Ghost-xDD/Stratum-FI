@@ -9,14 +9,7 @@ import { motion } from 'framer-motion';
 import { fadeInUp, staggerContainer } from '@/lib/constants';
 import { formatUSD, formatPercentage } from '@/lib/utils';
 import { MOCK_DATA } from '@/lib/constants';
-import {
-  Sparkles,
-  ArrowLeft,
-  DollarSign,
-  TrendingUp,
-  Clock,
-  Info,
-} from 'lucide-react';
+import { Sparkles, ArrowLeft, Info } from 'lucide-react';
 import Link from 'next/link';
 
 export default function HarvestPage() {
@@ -142,8 +135,8 @@ export default function HarvestPage() {
                   <p className="text-sm text-text-secondary">
                     Primary yield (MUSD/BTC pool) automatically reduces your
                     debt balance. Only secondary yield (bMUSD/MUSD pool) needs
-                    manual harvesting. The protocol's keeper bot handles the
-                    primary yield for you!
+                    manual harvesting. The protocol&apos;s keeper bot handles
+                    the primary yield for you!
                   </p>
                 </div>
               </div>

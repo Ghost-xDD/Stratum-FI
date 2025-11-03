@@ -5,8 +5,8 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { motion } from 'framer-motion';
-import { ArrowRight, Sparkles, TrendingUp, Shield } from 'lucide-react';
-import { fadeInUp, fadeIn, staggerContainer } from '@/lib/constants';
+import { ArrowRight, Sparkles } from 'lucide-react';
+import { fadeInUp, staggerContainer } from '@/lib/constants';
 
 export function HeroSection() {
   return (

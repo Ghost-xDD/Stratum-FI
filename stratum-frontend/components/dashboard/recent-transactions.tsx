@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { formatUSD, formatBTC, truncateAddress } from '@/lib/utils';
+import { truncateAddress } from '@/lib/utils';
 import { fadeInUp } from '@/lib/constants';
 import {
   ArrowDownIcon,
@@ -165,7 +165,16 @@ export function RecentTransactions() {
                         {getTransactionLabel(tx.type)}
                       </p>
                       <Badge
-                        variant={getStatusColor(tx.status) as any}
+                        variant={
+                          getStatusColor(tx.status) as
+                            | 'default'
+                            | 'secondary'
+                            | 'destructive'
+                            | 'success'
+                            | 'warning'
+                            | 'outline'
+                            | 'glass'
+                        }
                         className="text-xs"
                       >
                         <span className="flex items-center gap-1">

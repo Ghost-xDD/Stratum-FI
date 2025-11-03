@@ -12,10 +12,8 @@ interface DashboardLayoutProps {
 
 export function DashboardLayout({ children }: DashboardLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
-  const [mounted, setMounted] = React.useState(false);
 
   React.useEffect(() => {
-    setMounted(true);
     // Open sidebar by default on desktop
     const isDesktop = window.innerWidth >= 1024;
     setSidebarOpen(isDesktop);

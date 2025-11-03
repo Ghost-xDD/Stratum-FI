@@ -11,10 +11,8 @@ import { ConnectButton } from '@rainbow-me/rainbowkit';
 import {
   LayoutDashboard,
   Bitcoin,
-  DollarSign,
   Zap,
   Sparkles,
-  Menu,
   X,
   ChevronLeft,
   Settings,
