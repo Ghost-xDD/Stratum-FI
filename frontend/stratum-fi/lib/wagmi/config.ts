@@ -17,7 +17,7 @@ export const mezoTestnet = defineChain({
   blockExplorers: {
     default: {
       name: 'Mezo Explorer',
-      url: 'https://explorer.testnet.mezo.org',
+      url: 'https://explorer.test.mezo.org',
     },
   },
   testnet: true,
@@ -25,8 +25,7 @@ export const mezoTestnet = defineChain({
 
 export const config = getDefaultConfig({
   appName: 'Stratum Fi',
-  projectId:
-    process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || '',
+  projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || '',
   chains: [mezoTestnet],
   ssr: true,
 });

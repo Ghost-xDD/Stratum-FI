@@ -147,7 +147,7 @@ export default function VaultPage() {
               label: 'View Transaction',
               onClick: () =>
                 window.open(
-                  `https://explorer.testnet.mezo.org/tx/${depositHash}`,
+                  `https://explorer.test.mezo.org/tx/${depositHash}`,
                   '_blank'
                 ),
             }
@@ -166,7 +166,7 @@ export default function VaultPage() {
               label: 'View Transaction',
               onClick: () =>
                 window.open(
-                  `https://explorer.testnet.mezo.org/tx/${borrowHash}`,
+                  `https://explorer.test.mezo.org/tx/${borrowHash}`,
                   '_blank'
                 ),
             }

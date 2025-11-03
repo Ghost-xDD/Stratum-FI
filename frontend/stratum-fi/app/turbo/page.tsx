@@ -123,7 +123,7 @@ export default function TurboPage() {
               label: 'View Transaction',
               onClick: () =>
                 window.open(
-                  `https://explorer.testnet.mezo.org/tx/${hash}`,
+                  `https://explorer.test.mezo.org/tx/${hash}`,
                   '_blank'
                 ),
             }

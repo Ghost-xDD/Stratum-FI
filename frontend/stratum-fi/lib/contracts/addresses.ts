@@ -35,7 +35,7 @@ export const MEZO_TESTNET = {
   blockExplorers: {
     default: {
       name: 'Mezo Explorer',
-      url: 'https://explorer.testnet.mezo.org',
+      url: 'https://explorer.test.mezo.org',
     },
   },
   testnet: true,

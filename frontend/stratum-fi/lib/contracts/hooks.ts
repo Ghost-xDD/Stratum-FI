@@ -433,6 +433,8 @@ export function useDashboardData(userAddress?: string) {
   const yields = useClaimableYield();
   const protocol = useProtocolStats();
   const btcBalance = useBTCBalance(userAddress);
+  const musdBalance = useMUSDBalance(userAddress);
+  const bmusdBalance = useBMUSDBalance(userAddress);
 
   return {
     position: position.position,
@@ -440,12 +442,22 @@ export function useDashboardData(userAddress?: string) {
     yieldData: yields.yieldData,
     protocolStats: protocol.stats,
     btcBalance: btcBalance.balance,
+    musdBalance: musdBalance.balance,
+    bmusdBalance: bmusdBalance.balance,
     loading:
       position.loading ||
       turbo.loading ||
       yields.loading ||
       protocol.loading ||
-      btcBalance.loading,
-    error: position.error || turbo.error || protocol.error || btcBalance.error,
+      btcBalance.loading ||
+      musdBalance.loading ||
+      bmusdBalance.loading,
+    error:
+      position.error ||
+      turbo.error ||
+      protocol.error ||
+      btcBalance.error ||
+      musdBalance.error ||
+      bmusdBalance.error,
   };
 }

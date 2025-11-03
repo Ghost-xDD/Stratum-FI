@@ -97,7 +97,7 @@ export default function DashboardPage() {
         icon: TrendingUp,
       },
       {
-        href: 'https://explorer.testnet.mezo.org',
+        href: 'https://explorer.test.mezo.org',
         label: 'Network explorer',
         description: 'Inspect transactions and contract state externally.',
         icon: ExternalLink,

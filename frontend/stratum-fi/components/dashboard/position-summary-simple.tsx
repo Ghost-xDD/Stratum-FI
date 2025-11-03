@@ -21,6 +21,7 @@ import {
   Zap,
   TrendingUp,
   Loader2,
+  Wallet,
 } from 'lucide-react';
 import { useDashboardData } from '@/lib/contracts';
 import { useBTCPrice } from '@/lib/hooks/useBTCPrice';
@@ -38,6 +39,9 @@ export function PositionSummarySimple({
     yieldData,
     loading,
     error,
+    btcBalance,
+    musdBalance,
+    bmusdBalance,
   } = useDashboardData(userAddress);
 
   const { price: btcPriceUSD } = useBTCPrice();
@@ -113,6 +117,9 @@ export function PositionSummarySimple({
   const debtDisplay = formatTokenAmount(position.debt, 2);
   const availableDisplay = formatTokenAmount(position.available, 2);
   const secondaryLPDisplay = formatTokenAmount(position.secondaryLP, 2);
+  const btcBalanceDisplay = formatTokenAmount(btcBalance, 4);
+  const musdBalanceDisplay = formatTokenAmount(musdBalance, 2);
+  const bmusdBalanceDisplay = formatTokenAmount(bmusdBalance, 2);
 
   return (
     <motion.div
@@ -189,6 +196,55 @@ export function PositionSummarySimple({
               ≈ {availableNum !== null ? formatUSD(availableNum) : '—'}
             </p>
             <p className="text-xs text-text-muted mt-2">Can borrow</p>
+          </div>
+        </div>
+      </Card>
+
+      {/* Wallet Balances */}
+      <Card className="p-4">
+        <div className="flex items-center gap-2 mb-3">
+          <Wallet className="h-4 w-4 text-primary" />
+          <h3 className="text-sm font-medium text-text-secondary">
+            Wallet Balances
+          </h3>
+        </div>
+        <div className="grid gap-3 sm:grid-cols-3">
+          <div className="flex items-center justify-between rounded-lg border border-white/10 bg-dark-surface/40 px-3 py-2">
+            <div>
+              <p className="text-[11px] uppercase tracking-wide text-text-muted">
+                BTC
+              </p>
+              <p className="text-sm font-semibold font-mono text-text-primary">
+                {btcBalanceDisplay === '—' ? '—' : `${btcBalanceDisplay} BTC`}
+              </p>
+            </div>
+            <Bitcoin className="h-4 w-4 text-primary/80" />
+          </div>
+          <div className="flex items-center justify-between rounded-lg border border-white/10 bg-dark-surface/40 px-3 py-2">
+            <div>
+              <p className="text-[11px] uppercase tracking-wide text-text-muted">
+                MUSD
+              </p>
+              <p className="text-sm font-semibold font-mono text-text-primary">
+                {musdBalanceDisplay === '—'
+                  ? '—'
+                  : `${musdBalanceDisplay} MUSD`}
+              </p>
+            </div>
+            <Sparkles className="h-4 w-4 text-secondary/80" />
+          </div>
+          <div className="flex items-center justify-between rounded-lg border border-white/10 bg-dark-surface/40 px-3 py-2">
+            <div>
+              <p className="text-[11px] uppercase tracking-wide text-text-muted">
+                bMUSD
+              </p>
+              <p className="text-sm font-semibold font-mono text-text-primary">
+                {bmusdBalanceDisplay === '—'
+                  ? '—'
+                  : `${bmusdBalanceDisplay} bMUSD`}
+              </p>
+            </div>
+            <DollarSign className="h-4 w-4 text-text-muted/80" />
           </div>
         </div>
       </Card>
